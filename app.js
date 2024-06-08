@@ -5,6 +5,7 @@ const session = require('express-session'); // Подключение библи
 const cookieParser = require('cookie-parser'); // Подключение библиотеки cookie-parser для работы сервера с cookies
 const hbs = require('hbs'); // Подключение шаблонизатора Handlebars для генерации HTML-страниц
 const { pool, initDb } = require('./db'); // Подключение модуля для работы с базой данных PostgreSQL
+const pgSession = require('connect-pg-simple')(session); // Подключение connect-pg-simple
 
 // Создание экземпляра приложения Express
 const app = express();
@@ -40,6 +41,10 @@ async function checkDbConnection() {
   // Использование middleware express-session для управления сессиями
   app.use(
     session({
+      store: new pgSession({
+        pool: pool, // Используем пул соединений PostgreSQL
+        tableName: 'session', // Название таблицы для хранения сессий
+      }),
       secret: process.env.SESSION_SECRET, // Параметры секретного ключа сессии
       resave: false,
       saveUninitialized: false,
@@ -80,8 +85,8 @@ async function checkDbConnection() {
     res.render('index'); // Рендеринг шаблона главной страницы
   });
 
-  // Запуск сервера, порт 3000
-  app.listen(process.env.PORT, () => {
-    console.log('Server is running on port 3000');
+  // Запуск сервера
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server is running on port ${process.env.PORT || 3000}`);
   });
 })();

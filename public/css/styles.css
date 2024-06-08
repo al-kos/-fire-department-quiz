@@ -10,6 +10,10 @@ body {
   margin: 0;
 }
 
+.content-wrapper {
+  padding-bottom: 140px;
+}
+
 .main-container {
   width: 80%;
   margin: 0 auto; /* Центрирование контейнера */
@@ -53,4 +57,10 @@ button {
 
 .footer .list-inline-item {
   margin: 0 0.5rem;
+}
+
+@media (max-width: 350px) {
+  .navbar-nav {
+    display: none !important;
+  }
 }
