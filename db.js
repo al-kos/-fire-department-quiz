@@ -39,7 +39,7 @@ async function initDb() {
       `);
 
       // Добавление администратора
-      const hashedPassword = await bcrypt.hash('admin', 10);
+      const hashedPassword = await bcrypt.hash('admin', BCRYPT_COUNT);
       await client.query(
         `
         INSERT INTO users (login, email, password, isAdmin)

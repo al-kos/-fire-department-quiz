@@ -10,7 +10,7 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
   const { login, email, password } = req.body; // Получение данных из тела запроса
-  const hashedPassword = await bcrypt.hash(password, 10); // Хэширование пароля перед сохранением в базу данных
+  const hashedPassword = await bcrypt.hash(password, BCRYPT_COUNT); // Хэширование пароля перед сохранением в базу данных
   try {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [
       email,
