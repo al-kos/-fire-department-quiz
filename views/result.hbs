@@ -1,0 +1,10 @@
+{{!< layout}}
+{{#if noResults}}
+  <p>Результатов нет</p>
+  <a class="btn btn-secondary mt-2" href="/">Вернуться на главную</a>
+{{else}}
+  <h1>Результаты викторины</h1>
+  <p>Всего вопросов: {{totalQuestions}}</p>
+  <p>Правильных ответов: {{correctAnswers}}</p>
+  <a class="btn btn-secondary mt-2" href="/">Вернуться на главную</a>
+{{/if}}

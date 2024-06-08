@@ -1,0 +1,22 @@
+{{!< layout}}
+<h1>Войти</h1>
+{{#if error}}
+  <p class="text-danger">{{error}}</p>
+  {{#if redirect}}
+    <script>
+      setTimeout(() => {
+        window.location.href = '/register';
+      }, 1500);
+    </script>
+  {{/if}}
+{{/if}}
+<form action="/login" method="POST">
+  <div class="form-group">
+    <input class="form-control" type="text" name="login" placeholder="Login" required>
+  </div>
+  <div class="form-group">
+    <input class="form-control" type="password" name="password" placeholder="Password" required>
+  </div>
+  <button class="btn btn-primary" type="submit">Войти</button>
+</form>
+<button class="btn btn-secondary mt-2" onclick="window.location.href='/'">Вернуться на главную</button>

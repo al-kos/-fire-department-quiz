@@ -1,0 +1,56 @@
+/* styles.css */
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.main-container {
+  width: 80%;
+  margin: 0 auto; /* Центрирование контейнера */
+  flex: 1; /* Занимает оставшееся пространство */
+}
+
+.navbar {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.container-nav {
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+  margin-bottom: 10px;
+}
+
+button {
+  margin-top: 10px;
+  width: 200px;
+}
+
+.footer {
+  padding: 1rem 0;
+  background-color: #f8f9fa;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.footer .list-inline {
+  margin-bottom: 0;
+}
+
+.footer .list-inline-item {
+  margin: 0 0.5rem;
+}

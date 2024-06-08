@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <!-- Подключение Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Подключение Font Awesome для иконок -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <!-- Подключение пользовательских стилей -->
+  <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Навигационное меню -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-nav">
+      <a class="navbar-brand" href="/">
+        <img src="/images/kaska-icon.png" alt="Главная" style="height: 55px;">
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          {{#if user}}
+            {{#if user.isadmin}}
+              <li class="nav-item"><a class="nav-link" href="/edit-quiz">Изменить викторину</a></li>
+              <li class="nav-item"><a class="nav-link" href="/logout">Выйти</a></li>
+            {{else}}
+              <li class="nav-item"><a class="nav-link" href="/profile">Профиль</a></li>
+              <li class="nav-item"><a class="nav-link" href="/quiz">Викторина</a></li>
+              <li class="nav-item"><a class="nav-link" href="/result">Результаты</a></li>
+              <li class="nav-item"><a class="nav-link" href="/logout">Выйти</a></li>
+            {{/if}}
+          {{else}}
+            <li class="nav-item"><a class="nav-link" href="/register">Зарегистрироваться</a></li>
+            <li class="nav-item"><a class="nav-link" href="/login">Войти</a></li>
+          {{/if}}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container mt-4">
+    {{{body}}}
+  </div>
+
+  <!-- Футер -->
+  <footer class="footer bg-light text-center mt-4">
+    <div class="container">
+      <ul class="list-inline">
+        <li class="list-inline-item">
+          <a href="https://www.youtube.com/" target="_blank">
+            <i class="fab fa-youtube fa-2x"></i>
+          </a>
+        </li>
+        <li class="list-inline-item">
+          <a href="https://github.com/" target="_blank">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="list-inline-item">
+          <a href="https://telegram.org/" target="_blank">
+            <i class="fab fa-telegram fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>
