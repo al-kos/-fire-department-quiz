@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "application for testing knowledge of safe",
   "main": "app.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
