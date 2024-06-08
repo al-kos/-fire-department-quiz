@@ -69,10 +69,17 @@ router.post('/login', async (req, res) => {
 });
 
 // Выход пользователя из системы
-router.get('/logout', (req, res) => {
-  req.session.destroy(); // Удаление сессии пользователя
-  res.clearCookie('user'); // Удаление cookie с пользователем
-  res.redirect('/'); // Перенаправление на главную страницу
+router.get('/logout', async (req, res) => {
+  try {
+    const sessionId = req.sessionID; // Получение идентификатора сессии
+    await pool.query('DELETE FROM session WHERE sid = $1', [sessionId]); // Удаление сессии из базы данных
+    req.session.destroy(); // Удаление сессии пользователя
+    res.clearCookie('user'); // Удаление cookie с пользователем
+    res.redirect('/'); // Перенаправление на главную страницу
+  } catch (err) {
+    console.error(err);
+    res.send('Возникла ошибка при выходе пользователя');
+  }
 });
 
 module.exports = router;
