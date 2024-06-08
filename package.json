@@ -1,7 +1,7 @@
 {
-  "name": "testing_app",
+  "name": "-fire-department-quiz",
   "version": "1.0.0",
-  "description": "application for testing knowledge of safe",
+  "description": "application for testing knowledge of fire-safe",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
