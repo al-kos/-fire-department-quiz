@@ -1,0 +1,20 @@
+{{!< layout}}
+<h1>Результаты Викторины</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Логин пользователя</th>
+      <th>Дата прохождения</th>
+      <th>Результат</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each results}}
+      <tr>
+        <td>{{this.login}}</td>
+        <td>{{this.quiz_date}}</td>
+        <td>{{#if this.issuccess}}Тестирование пройдено успешно{{else}}Тестирование не пройдено{{/if}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

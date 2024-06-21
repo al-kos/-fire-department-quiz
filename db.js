@@ -53,62 +53,118 @@ async function initDb() {
       await client.query(`
         CREATE TABLE IF NOT EXISTS quiz_questions (
           id SERIAL PRIMARY KEY,
-          question TEXT NOT NULL,
-          option1 TEXT NOT NULL,
-          option2 TEXT NOT NULL,
-          option3 TEXT NOT NULL,
-          answer TEXT NOT NULL
+          question TEXT NOT NULL
         );
       `);
 
-      // Добавление вопросов
+      // Создание таблицы ответов
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS quiz_answers (
+          id SERIAL PRIMARY KEY,
+          question_id INTEGER REFERENCES quiz_questions(id),
+          answer TEXT NOT NULL,
+          is_correct BOOLEAN NOT NULL
+        );
+      `);
+
+      // Добавление вопросов и ответов
       const questions = [
         {
           question:
+            'Что следует делать при обнаружении поврежденного электрического кабеля на рабочем месте?',
+          answers: [
+            {
+              text: 'Попытаться изолировать участок кабеля с помощью изоляционной ленты',
+              isCorrect: false,
+            },
+            {
+              text: 'Немедленно сообщить руководству и специалистам по безопасности',
+              isCorrect: true,
+            },
+            {
+              text: 'Подключить кабель к рабочему оборудованию, чтобы продолжить работу',
+              isCorrect: false,
+            },
+          ],
+        },
+        {
+          question:
+            'Какие предметы обязательно должны быть на рабочем месте для выполнения работ с высоты?',
+          answers: [
+            {
+              text: 'Ремни безопасности и средства индивидуальной защиты',
+              isCorrect: true,
+            },
+            {
+              text: 'Лестницы и таблички с предупреждениями',
+              isCorrect: false,
+            },
+            { text: 'Перчатки и защитные очки', isCorrect: false },
+          ],
+        },
+        {
+          question:
+            'Что делать, если рабочее место не оборудовано системой вентиляции?',
+          answers: [
+            {
+              text: 'Использовать переносной вентилятор для улучшения воздушного обмена',
+              isCorrect: true,
+            },
+            {
+              text: 'Не предпринимать никаких действий и работать в обычном режиме',
+              isCorrect: false,
+            },
+            {
+              text: 'Вызвать электрика для установки вентиляционной системы',
+              isCorrect: false,
+            },
+          ],
+        },
+        {
+          question:
+            'Какие меры безопасности следует соблюдать при работе с химическими веществами?',
+          answers: [
+            {
+              text: 'Использовать только необходимое количество вещества и хранить их в отдельной комнате',
+              isCorrect: false,
+            },
+            {
+              text: 'Носить защитную одежду, перчатки и маску, соблюдать правила удаления отходов',
+              isCorrect: true,
+            },
+            {
+              text: 'Работать с химическими веществами вне зоны доступа других сотрудников',
+              isCorrect: false,
+            },
+          ],
+        },
+        {
+          question:
             'Какие первичные средства пожаротушения являются наиболее эффективными для тушения пожара на начальной стадии?',
-          option1: 'Огнетушители',
-          option2: 'Пожарные краны',
-          option3: 'Автоматические установки пожаротушения',
-          answer: 'Огнетушители',
-        },
-        {
-          question:
-            'Какой из следующих видов огнетушителей предназначен для тушения пожаров класса B?',
-          option1: 'Пенный огнетушитель',
-          option2: 'Водяной огнетушитель',
-          option3: 'Углекислотный огнетушитель',
-          answer: 'Пенный огнетушитель',
-        },
-        {
-          question:
-            'Что необходимо сделать в первую очередь при обнаружении пожара?',
-          option1: 'Покинуть помещение',
-          option2: 'Сообщить в пожарную охрану',
-          option3: 'Начать тушить пожар',
-          answer: 'Сообщить в пожарную охрану',
-        },
-        {
-          question:
-            'Каким образом следует эвакуироваться из здания при пожаре?',
-          option1: 'На лифте',
-          option2: 'По лестнице',
-          option3: 'Через окна',
-          answer: 'По лестнице',
-        },
-        {
-          question:
-            'Что является основным средством индивидуальной защиты органов дыхания при пожаре?',
-          option1: 'Противогаз',
-          option2: 'Респиратор',
-          option3: 'Маска',
-          answer: 'Противогаз',
+          answers: [
+            { text: 'Огнетушители', isCorrect: true },
+            { text: 'Пожарные краны', isCorrect: false },
+            {
+              text: 'Автоматические установки пожаротушения',
+              isCorrect: false,
+            },
+          ],
         },
       ];
+
       for (const q of questions) {
-        await client.query(
-          'INSERT INTO quiz_questions (question, option1, option2, option3, answer) VALUES ($1, $2, $3, $4, $5)',
-          [q.question, q.option1, q.option2, q.option3, q.answer],
+        const questionResult = await client.query(
+          'INSERT INTO quiz_questions (question) VALUES ($1) RETURNING id',
+          [q.question],
         );
+        const questionId = questionResult.rows[0].id;
+
+        for (const a of q.answers) {
+          await client.query(
+            'INSERT INTO quiz_answers (question_id, answer, is_correct) VALUES ($1, $2, $3)',
+            [questionId, a.text, a.isCorrect],
+          );
+        }
       }
 
       // Создание таблицы результатов викторины
@@ -118,6 +174,7 @@ async function initDb() {
           user_id INTEGER REFERENCES users(id),
           score INTEGER NOT NULL,
           total_questions INTEGER NOT NULL,
+          isSuccess BOOLEAN NOT NULL,
           quiz_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -148,6 +205,19 @@ async function initDb() {
         CREATE INDEX IDX_session_expire ON session (expire);
       `);
     }
+
+    // Создание представления для удобного получения данных
+    await client.query(`
+      CREATE OR REPLACE VIEW quiz_questions_with_answers AS
+      SELECT
+        q.id AS question_id,
+        q.question,
+        a.id AS answer_id,
+        a.answer,
+        a.is_correct
+      FROM quiz_questions q
+      LEFT JOIN quiz_answers a ON q.id = a.question_id;
+    `);
 
     console.log('Инициализация базы данных выполнена успешно');
   } catch (err) {

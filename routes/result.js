@@ -12,26 +12,21 @@ router.get('/result', async (req, res) => {
   }
   // Получаем идентификатор пользователя из сессии
   const userId = req.session.user.id;
-  // Запрос к базе данных для получения результатов последней викторины пользователя
+  // Запрос к базе данных для получения всех результатов викторин пользователя
   try {
     const result = await pool.query(
-      'SELECT * FROM quiz_results WHERE user_id = $1 ORDER BY quiz_date DESC LIMIT 1',
+      'SELECT * FROM quiz_results WHERE user_id = $1 ORDER BY quiz_date DESC',
       [userId],
     );
-    // Если результаты есть, получаем первый элемент (последняя викторина)
-    if (result.rows.length > 0) {
-      const quizResult = result.rows[0];
-      // Рендерим шаблон  с данными о викторине
-      res.render('result', {
-        totalQuestions: quizResult.total_questions,
-        correctAnswers: quizResult.score,
-      });
-    } else {
-      // Если результатов нет, рендерим шаблон  с информацией о том, что результатов нет
-      res.render('result', {
-        noResults: true,
-      });
-    }
+    // Рендерим шаблон с данными о викторинах пользователя
+    res.render('result', {
+      results: result.rows.map((row) => ({
+        totalQuestions: row.total_questions,
+        correctAnswers: row.score,
+        isSuccess: row.score === row.total_questions, // Определяем успешность по количеству правильных ответов
+        quiz_date_formatted: new Date(row.quiz_date).toLocaleDateString(), // Формат даты
+      })),
+    });
   } catch (err) {
     // В случае ошибки выводим сообщение в консоль и отправляем сообщение об ошибке пользователю
     console.error(err);

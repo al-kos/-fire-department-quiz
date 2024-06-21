@@ -4,7 +4,17 @@
   <a class="btn btn-secondary mt-2" href="/">Вернуться на главную</a>
 {{else}}
   <h1>Результаты викторины</h1>
-  <p>Всего вопросов: {{totalQuestions}}</p>
-  <p>Правильных ответов: {{correctAnswers}}</p>
+  
+  {{#each results}}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Дата тестирования: {{quiz_date_formatted}}</h5>
+        <p class="card-text">Всего вопросов: {{totalQuestions}}</p>
+        <p class="card-text">Правильных ответов: {{correctAnswers}}</p>
+        <p class="card-text">Пройдено тестирование: {{#if isSuccess}}Да{{else}}Нет{{/if}}</p>
+      </div>
+    </div>
+  {{/each}}
+  
   <a class="btn btn-secondary mt-2" href="/">Вернуться на главную</a>
 {{/if}}

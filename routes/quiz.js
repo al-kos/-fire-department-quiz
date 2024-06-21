@@ -1,40 +1,37 @@
-// Подключение библиотеки Express и создание экземпляра Router
 const express = require('express');
 const router = express.Router();
-// Подключение объекта pool для взаимодействия с базой данных
 const { pool } = require('../db');
+
 // Маршрут для отображения вопросов викторины
 router.get('/quiz', async (req, res) => {
-  // Проверка наличия пользователя в сессии
   if (!req.session.user) {
-    // Если пользователя нет, перенаправляем на страницу входа
     return res.redirect('/login');
   }
-  // Проверка наличия данных викторины в сессии
+
   if (!req.session.quiz) {
-    // Если данных викторины нет, инициализируем их
     req.session.quiz = {
       currentQuestionIndex: 0,
       correctAnswers: 0,
     };
   }
-  // Запрос к базе данных для получения всех вопросов
+
   try {
-    const result = await pool.query('SELECT * FROM quiz_questions');
+    const result = await pool.query('SELECT id, question FROM quiz_questions');
     const questions = result.rows;
-    const quiz = req.session.quiz; // Получение данных викторины из сессии
-    const currentQuestion = questions[quiz.currentQuestionIndex]; // Получение текущего вопроса
-    // Рендеринг вопроса и варианты ответов
+    const quiz = req.session.quiz;
+    const currentQuestion = questions[quiz.currentQuestionIndex];
+
+    const answersResult = await pool.query(
+      'SELECT id, answer FROM quiz_answers WHERE question_id = $1',
+      [currentQuestion.id],
+    );
+    const answers = answersResult.rows;
+
     res.render('quiz', {
       question: currentQuestion.question,
-      options: [
-        currentQuestion.option1,
-        currentQuestion.option2,
-        currentQuestion.option3,
-      ],
+      options: answers.map((answer) => answer.answer),
     });
   } catch (err) {
-    // В случае ошибки выводим сообщение в консоль и отправляем сообщение об ошибке пользователю
     console.error(err);
     res.send('Возникла ошибка');
   }
@@ -42,41 +39,47 @@ router.get('/quiz', async (req, res) => {
 
 // Маршрут для обработки ответов на вопросы викторины
 router.post('/quiz', async (req, res) => {
-  // Запрос к базе данных для получения всех вопросов
   try {
-    const result = await pool.query('SELECT * FROM quiz_questions');
+    const result = await pool.query('SELECT id, question FROM quiz_questions');
     const questions = result.rows;
     const quiz = req.session.quiz;
     const userAnswer = req.body.answer;
     const currentQuestion = questions[quiz.currentQuestionIndex];
-    // Проверка ответа пользователя
-    if (userAnswer === currentQuestion.answer) {
-      quiz.correctAnswers++; // Увеличение количества правильных ответов
+
+    const answersResult = await pool.query(
+      'SELECT id, answer, is_correct FROM quiz_answers WHERE question_id = $1',
+      [currentQuestion.id],
+    );
+    const answers = answersResult.rows;
+    const correctAnswer = answers.find((answer) => answer.is_correct).answer;
+
+    if (userAnswer === correctAnswer) {
+      quiz.correctAnswers++;
     }
-    // Увеличение индекса текущего вопроса
+
     quiz.currentQuestionIndex++;
-    // Проверка, закончилась ли викторина
+
     if (quiz.currentQuestionIndex >= questions.length) {
-      // Сохранение результатов в базе данных
       const userId = req.session.user.id;
+      const totalQuestions = questions.length;
+      const score = quiz.correctAnswers;
+      const isSuccess = score / totalQuestions > 0.8;
+
       await pool.query(
-        'INSERT INTO quiz_results (user_id, score, total_questions) VALUES ($1, $2, $3)',
-        [userId, quiz.correctAnswers, questions.length],
+        'INSERT INTO quiz_results (user_id, score, total_questions, isSuccess) VALUES ($1, $2, $3, $4)',
+        [userId, score, totalQuestions, isSuccess],
       );
-      // Сохранение результатов в сессии для последующей передачи на страницу результатов
+
       req.session.quizResults = {
-        totalQuestions: questions.length,
-        correctAnswers: quiz.correctAnswers,
+        totalQuestions,
+        correctAnswers: score,
       };
-      // Очистка данных викторины из сессии
       req.session.quiz = null;
-      // Перенаправление на страницу результатов
       res.redirect('/result');
     } else {
       res.redirect('/quiz');
     }
   } catch (err) {
-    // В случае ошибки выводим сообщение в консоль и отправляем сообщение об ошибке пользователю
     console.error(err);
     res.send('Возникла ошибка');
   }

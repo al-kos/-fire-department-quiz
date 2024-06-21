@@ -4,15 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}}</title>
-  <!-- Подключение Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Подключение Font Awesome для иконок -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-  <!-- Подключение пользовательских стилей -->
   <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body>
-  <!-- Навигационное меню -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-nav">
       <a class="navbar-brand" href="/">
@@ -23,6 +19,7 @@
           {{#if user}}
             {{#if user.isadmin}}
               <li class="nav-item"><a class="nav-link" href="/edit-quiz">Изменить викторину</a></li>
+              <li class="nav-item"><a class="nav-link" href="/results">Результаты</a></li>
               <li class="nav-item"><a class="nav-link" href="/logout">Выйти</a></li>
             {{else}}
               <li class="nav-item"><a class="nav-link" href="/profile">Профиль</a></li>
@@ -43,7 +40,6 @@
     {{{body}}}
   </div>
 
-  <!-- Футер -->
   <footer class="footer bg-light text-center mt-4">
     <div class="container">
       <ul class="list-inline">

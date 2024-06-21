@@ -1,37 +1,35 @@
 {{!< layout}}
 <h1>Редактирование викторины</h1>
-  {{#each questions}}
-    <div class="mb-3">
-      <form action="/edit-quiz/update/{{this.id}}" method="POST">
-        <div class="form-group">
-          <label>Вопрос:</label>
-          <input class="form-control" type="text" name="question" value="{{this.question}}" required>
-        </div>
-        <div class="form-group">
-          <label>Вариант 1:</label>
-          <input class="form-control" type="text" name="option1" value="{{this.option1}}" required>
-        </div>
-        <div class="form-group">
-          <label>Вариант 2:</label>
-          <input class="form-control" type="text" name="option2" value="{{this.option2}}" required>
-        </div>
-        <div class="form-group">
-          <label>Вариант 3:</label>
-          <input class="form-control" type="text" name="option3" value="{{this.option3}}" required>
-        </div>
-        <div class="form-group">
-          <label>Правильный ответ:</label>
-          <input class="form-control" type="text" name="answer" value="{{this.answer}}" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Обновить вопрос</button>
-      </form>
-      <form action="/edit-quiz/delete/{{this.id}}" method="POST" class="mt-2">
-        <button class="btn btn-danger" type="submit">Удалить вопрос</button>
-      </form>
-    </div>
-  {{/each}}
-  <hr>
-  <div class="content-wrapper">
+{{#each questions}}
+  <div class="mb-3">
+    <form action="/edit-quiz/update/{{this.id}}" method="POST">
+      <div class="form-group">
+        <label>Вопрос:</label>
+        <input class="form-control" type="text" name="question" value="{{this.question}}" required>
+      </div>
+      {{#each this.answers}}
+      <div class="form-group">
+        <label>Вариант {{inc @index}}:</label>
+        <input class="form-control" type="text" name="option{{inc @index}}" value="{{this.answer}}" required>
+      </div>
+      {{/each}}
+      <div class="form-group">
+        <label>Правильный ответ:</label>
+        <select class="form-control" name="answer" required>
+          {{#each this.answers}}
+          <option value="option{{inc @index}}" {{#if this.is_correct}}selected{{/if}}>{{inc @index}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Обновить вопрос</button>
+    </form>
+    <form action="/edit-quiz/delete/{{this.id}}" method="POST" class="mt-2">
+      <button class="btn btn-danger" type="submit">Удалить вопрос</button>
+    </form>
+  </div>
+{{/each}}
+<hr>
+<div class="content-wrapper">
   <form action="/edit-quiz/add" method="POST">
     <div class="form-group">
       <label>Вопрос:</label>
@@ -51,8 +49,12 @@
     </div>
     <div class="form-group">
       <label>Правильный ответ:</label>
-      <input class="form-control" type="text" name="answer" required>
+      <select class="form-control" name="answer" required>
+        <option value="option1">1</option>
+        <option value="option2">2</option>
+        <option value="option3">3</option>
+      </select>
     </div>
     <button class="btn btn-success" type="submit">Добавить вопрос</button>
   </form>
-  </div>
+</div>
